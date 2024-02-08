@@ -1,7 +1,7 @@
 /* Relación tipo 1:1 */
 -- PASO 1
 CREATE TABLE usuarios_2(
-	id INT AUTO_INCREMENT PRIMARY KEY,
+	id INT AUTO_INCREMENT PRIMARY KEY, --auto_increment es para que no se repita el numero.
     nombre VARCHAR (50) NOT NULL,
     apellido VARCHAR (100) NOT NULL,
     email VARCHAR (100) NOT NULL,
@@ -83,15 +83,18 @@ ALTER TABLE usuarios ADD COLUMN id_categoria INT;
 
 
 -- PASO 3
-UPDATE usuarios SET id_categoria = 1 WHERE id IN (1, 5, 9, 13, 17);
+UPDATE usuarios SET id_categoria = 1 WHERE id_usuario IN (1, 5, 9, 13, 17);
+UPDATE usuarios SET id_categoria = 2 WHERE id_usuario IN (2, 6, 10, 14, 18);
+UPDATE usuarios SET id_categoria = 3 WHERE id_usuario IN (3, 6, 11, 15, 19);
+UPDATE usuarios SET id_categoria = 4 WHERE id_usuario IN (4, 7, 12, 16, 20);
 
 
 
 -- PASO 4
 SELECT usuarios.id,usuarios.nombre,usuarios.apellido,usuarios.email,usuarios.edad
-FROM usuarios
-JOIN roles ON roles.nombre_rol
-JOIN categorias ON categorias.nombre_categoria;
+FROM categorias
+JOIN usuarios ON categorias.id_categoria = usuarios.id_categoria
+JOIN roles ON usuarios.id_rol = roles.id_rol
 
 /* Relación tipo N:M */
 -- PASO 1
@@ -101,7 +104,7 @@ CREATE TABLE usuarios_categorias (
     id_categoria INT,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
 	FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
-
+);
 
 
 -- PASO 2
@@ -115,6 +118,7 @@ INSERT INTO usuarios_categorias (id_usuario, id_categoria) VALUES
 
 -- PASO 3
 SELECT usuarios.id,usuarios.nombre,usuarios.apellido,usuarios.email,usuarios.edad,roles.nombre_rol,categorias.nombre_categoria
-FROM usuarios
-JOIN roles ON usuarios.id_rol = roles.id_rol
-JOIN categorias ON usuarios.id_categoria = categorias.id_categoria;
+FROM usuarios_categorias AS usercat
+JOIN (roles,categorias AS cat, usuarios) ON usercat.id_usuario = usuarios.id_usuario
+AND usercat.id_categoria = cat.id_categoria
+AND usuarios.id_rol = roles.id_rol
